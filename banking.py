@@ -1,4 +1,5 @@
 from datetime import datetime
+from database.db import Database
 
 class Account:
     def __init__(self, id, balance, created_at):
@@ -49,33 +50,65 @@ class BankingSystem:
         account =  self.factory.create_account(user)
         user.add_account(account)
         return account
-
 class User:
-    def __init__(self, id, name, phone, email, created_at):
-        self.id = id
+    def __init__(self, name, phone, email, password):
+        self.id = Database().execute("INSERT", "INTO nasabah (nama, no_hp, email, password) VALUES (?, ?, ?, ?)", (name, phone, email, password))
         self.name = name
         self.phone = phone
         self.email = email
-        self.created_at = created_at
+        self.created_at = None
         self.accounts = []
 
-    def add_account(self, account):
-        self.accounts.append(account)
+    def add_account(self, jenis_rekening, nama_rekening, no_rekening, nasabah_id):
+        self.accounts.append({
+            "jenis_rekening": jenis_rekening,
+            "nama_rekening": nama_rekening,
+            "no_rekening": no_rekening,
+            "nasabah_id": nasabah_id
+        })
+        Database().execute("INSERT", "INTO rekening (jenis_rekening, nama_rekening, no_rekening, nasabah_id) VALUES (?, ?, ?, ?)", (f"{jenis_rekening}", f"{self.name} - {len(self.accounts)}", f"{self.id}{len(self.accounts)}", f"{self.id}"))
 
     def get_user(self):
+        user = Database().execute("SELECT", "* FROM nasabah WHERE id = ?", (f"{self.id}"))[0]
         return {
             "id": self.id,
-            "name": self.name,
-            "phone": self.phone,
-            "email": self.email,
-            "created_at": self.created_at,
+            "name": user[1],
+            "phone": user[2],
+            "email": user[3],
+            "created_at": user[5],
         }
-
+        
     def get_account(self):
         return {
             "name": self.name,
-            "accounts": [account.get_account() for account in self.accounts]
+            "accounts": [account for account in self.accounts]
         }
+
+class UserBuilder:
+    def __init__(self):
+        self._name = ""
+        self._phone = ""
+        self._email = ""
+        self._password = ""
+
+    def set_name(self, name):
+        self._name = name
+        return self
+
+    def set_phone(self, phone):
+        self._phone = phone
+        return self
+
+    def set_email(self, email):
+        self._email = email
+        return self
+    
+    def set_password(self, password):
+        self._password = password
+        return self
+
+    def build(self):
+        return User(self._name, self._phone, self._email, self._password)
 
 
 # Test case
