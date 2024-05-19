@@ -78,7 +78,10 @@ class User:
     
     def get_account(self):
         return [account.get_account() for account in self.accounts]
-        
+    
+    def get_transactions(self):
+        transactions = self._db.execute("SELECT", "* FROM transaksi WHERE rekening_id IN (SELECT no_rekening FROM rekening WHERE nasabah_id = ?)", (f"{self.id}",))
+        return transactions
 
 class UserBuilder:
     def __init__(self):

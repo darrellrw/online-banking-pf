@@ -4,6 +4,7 @@ import prettytable as pt
 from utils import numberToIDR, generate_random_price
 from merge_sort import BalanceMergeSort
 import os
+import pwinput
 
 def pause():
   input("\nPress the <ENTER> key to continue...")
@@ -39,7 +40,7 @@ class BankApp(BankingSystem):
     name = input("Name: ")
     phone = input("Phone: ")
     email = input("Email: ")
-    password = input("Password: ")
+    password = pwinput.pwinput("Password: ")
     self._db.execute("INSERT", "INTO nasabah (nama, no_hp, email, password) VALUES (?, ?, ?, ?)", (name, phone, email, password))
     print("Register success")
     self.auth()
@@ -50,7 +51,7 @@ class BankApp(BankingSystem):
     
     while attempt > 0:
       email = input("Email: ")
-      password = input("Password: ")
+      password = pwinput.pwinput(prompt="Password: ")
       user = self._db.execute("SELECT", "* FROM nasabah WHERE email = ? AND password = ?", (email, password))[0]
       if user:
         self._user = UserBuilder().set_id(user[0]).set_email(user[3]).set_name(user[1]).set_phone(user[2]).build()
@@ -152,6 +153,16 @@ class BankApp(BankingSystem):
         print("Penarikan dibatalkan")
     except AssertionError as e:
       print(str(e))
+  
+  def transaction_history(self):
+    transactions = self._user.get_transactions()
+    table = pt.PrettyTable()
+    table.field_names = ["No", "No Rekening", "Jenis", "Nominal", "Keterangan", "Tanggal"]
+    table.align["Keterangan"] = "l"
+    table.align["Nominal"] = "l"
+    table.align["Tanggal"] = "l"
+    table.add_rows([(transaction[0], transaction[1], transaction[2], numberToIDR(transaction[3]), transaction[4], transaction[5]) for transaction in transactions])
+    print(table)
     
   def main(self):
     self.auth()
@@ -170,7 +181,7 @@ class BankApp(BankingSystem):
     print("Welcome to Bank App")
     
     pil = None
-    while pil != 8:
+    while pil != 9:
       print("\nMenu")
       print("1. Lihat Saldo Semua Rekening")
       print("2. Transfer")
@@ -179,7 +190,8 @@ class BankApp(BankingSystem):
       print("5. Penarikan")
       print("6. Lihat data user")
       print("7. Buat Rekening Baru")
-      print("8. Exit")
+      print("8. Lihat Riwayat Transaksi")
+      print("9. Exit")
       pil = int(input("Pilih menu: "))
       
       if pil == 1:
@@ -202,7 +214,7 @@ class BankApp(BankingSystem):
         self.create_new_account()
         print("Rekening baru berhasil dibuat")
       elif pil == 8:
-        exit()
+        self.transaction_history()
       else:
         print("Invalid choice")
       pause()
