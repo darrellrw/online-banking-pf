@@ -1,20 +1,31 @@
 from datetime import datetime
+from database.db import Database
 from account import Account, Debit, User
+import random
 
 class BankingFactory:
     def create_account(self, user: User):
         raise NotImplementedError
 
 class DebitBankingFactory(BankingFactory):
-    def create_account(self, user: User):
-        return Debit(len(user.accounts) + 1, 0, datetime.now().strftime("%Y-%m-%d"))
-
-class BankingSystem:
-    def __init__(self, factory: DebitBankingFactory):
-        self.factory = factory
+    _db = None
+    
+    def __init__(self):
+        self._db = Database()
     
     def create_account(self, user: User):
-        account =  self.factory.create_account(user)
+        randomAccountNumber = random.randint(1000000000, 9999999999)
+        lastrowid = self._db.execute("INSERT", "INTO rekening (no_rekening, jenis_rekening, balance, nasabah_id) VALUES (?, ?, ?, ?)", (randomAccountNumber, "debit", 50000, user.id))
+        account = self._db.execute("SELECT", "* FROM rekening WHERE id = ?", (f"{lastrowid}",))[0]
+        return Debit(account[1], account[3])
+
+class BankingSystem:    
+    def __init__(self, factory: DebitBankingFactory):
+        self.factory = factory
+        self._db = Database()
+    
+    def create_account(self, user: User):
+        account = self.factory.create_account(user)
         user.add_account(account)
         return account
 

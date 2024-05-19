@@ -31,8 +31,7 @@ class Database:
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       no_rekening VARCHAR(255) NOT NULL,
       jenis_rekening VARCHAR(50) NOT NULL,
-      balance INTEGER DEFAULT 0,
-      nama_rekening VARCHAR(255) NOT NULL,
+      balance INTEGER DEFAULT 0, 
       nasabah_id INTEGER NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (nasabah_id) REFERENCES nasabah(id)
@@ -85,7 +84,7 @@ class Database:
 
   def _fetch(self, query, data):
     cursor = self.connection.cursor()
-    cursor.execute(query, (data))
+    cursor.execute(query, data)
     result = cursor.fetchall()
     cursor.close()
     return result
