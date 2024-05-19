@@ -11,7 +11,7 @@ class Database:
       cls._instance.connection = sqlite3.connect('./database/bank.db')
       cls._instance._create_table()
     return cls._instance
-
+  
 
   def _create_table(self):
     cursor = self.connection.cursor()
@@ -29,9 +29,10 @@ class Database:
     cursor.execute("""  
     CREATE TABLE IF NOT EXISTS rekening (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      jenis_rekening VARCHAR(50) NOT NULL,
-      nama_rekening VARCHAR(255) NOT NULL,
       no_rekening VARCHAR(255) NOT NULL,
+      jenis_rekening VARCHAR(50) NOT NULL,
+      balance INTEGER DEFAULT 0,
+      nama_rekening VARCHAR(255) NOT NULL,
       nasabah_id INTEGER NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (nasabah_id) REFERENCES nasabah(id)
