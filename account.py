@@ -41,24 +41,47 @@ class Debit(Account):
         self._db.execute("UPDATE", "rekening SET balance = balance - ? WHERE no_rekening = ?", (amount, self.account_number))
         self.balance -= amount
 
+class UserBuilder:
+    def __init__(self):
+        self.id = None
+        self.name = None
+        self.phone = None
+        self.email = None
+        self.password = None
+
+    def set_name(self, name):
+        self.name = name
+        return self
+
+    def set_phone(self, phone):
+        self.phone = phone
+        return self
+
+    def set_email(self, email):
+        self.email = email
+        return self
+    
+    def set_password(self, password):
+        self.password = password
+        return self
+    
+    def set_id(self, id):
+        self.id = id
+        return self
+
+    def build(self):
+        return User(self)
+
+
 class User:
     _db = Database()
     
-    def __init__(self, id, name, phone, email):
-        self.id = id
-        self.name = name
-        self.phone = phone
-        self.email = email
-        
-        acc = self._db.execute("SELECT", "* FROM rekening WHERE nasabah_id = ?", (f"{self.id}",))
-        self.accounts = [Debit(account[1], account[3]) for account in acc]
-    
-    def __init__(self, id, name, phone, email, password):
-        self.id = id
-        self.name = name
-        self.phone = phone
-        self.email = email
-        self.password = password
+    def __init__(self, builder: UserBuilder):
+        self.id = builder.id
+        self.name = builder.name
+        self.phone = builder.phone
+        self.email = builder.email
+        self.password = builder.password
         
         acc = self._db.execute("SELECT", "* FROM rekening WHERE nasabah_id = ?", (f"{self.id}",))
         self.accounts = [Debit(account[1], account[3]) for account in acc]
@@ -82,34 +105,3 @@ class User:
     def get_transactions(self):
         transactions = self._db.execute("SELECT", "* FROM transaksi WHERE rekening_id IN (SELECT no_rekening FROM rekening WHERE nasabah_id = ?)", (f"{self.id}",))
         return transactions
-
-class UserBuilder:
-    def __init__(self):
-        self._id = None
-        self._name = None
-        self._phone = None
-        self._email = None
-        self._password = None
-
-    def set_name(self, name):
-        self._name = name
-        return self
-
-    def set_phone(self, phone):
-        self._phone = phone
-        return self
-
-    def set_email(self, email):
-        self._email = email
-        return self
-    
-    def set_password(self, password):
-        self._password = password
-        return self
-    
-    def set_id(self, id):
-        self._id = id
-        return self
-
-    def build(self):
-        return User(self._id, self._name, self._phone, self._email, self._password)

@@ -1,10 +1,9 @@
 import sqlite3
 import os
-
-# Create Database class that implements Singleton
 class Database:
   _instance = None
 
+  # Method untuk membuat instance Database dan membuat tabel jika instance belum ada atau database belum ada
   def __new__(cls):
     if cls._instance is None or not os.path.exists('./database/bank.db'):
       cls._instance = super().__new__(cls)
@@ -12,7 +11,7 @@ class Database:
       cls._instance._create_table()
     return cls._instance
   
-
+  # Method untuk membuat tabel
   def _create_table(self):
     cursor = self.connection.cursor()
     cursor.execute("""
@@ -63,6 +62,7 @@ class Database:
   
     cursor.close()
     
+  # Method untuk eksekusi query
   def execute(self, method, query, data=None):
     if method.lower() == "insert":
       return self._insert(f"{method} {query}", data)
@@ -75,6 +75,7 @@ class Database:
     else:
       return None
   
+  # Method untuk insert data
   def _insert(self, query, data):
     cursor = self.connection.cursor()
     cursor.execute(query, data)
@@ -82,6 +83,7 @@ class Database:
     cursor.close()
     return cursor.lastrowid
 
+  # Method untuk fetch data
   def _fetch(self, query, data):
     cursor = self.connection.cursor()
     cursor.execute(query, data)
@@ -89,17 +91,20 @@ class Database:
     cursor.close()
     return result
 
+  # Method untuk update data
   def _update(self, query, data):
     cursor = self.connection.cursor()
     cursor.execute(query, data)
     cursor.close()
     self.connection.commit()
   
+  # Method untuk delete data
   def _delete(self, query, data):
     cursor = self.connection.cursor()
     cursor.execute(query, data)
     cursor.close()
     self.connection.commit()
   
+  # Method untuk menutup koneksi
   def __del__(self):
     self.connection.close()
