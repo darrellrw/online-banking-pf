@@ -1,20 +1,13 @@
 from banking import BankingSystem, DebitBankingFactory
 from account import User, UserBuilder, Debit
 import prettytable as pt
-from utils import numberToIDR, generate_random_price
+from feature_actions import transfer_action, payment_action, deposit_action, withdraw_action, numberToIDR
 from merge_sort import BalanceMergeSort
 import os
 import pwinput
 
 def pause():
   input("\nPress the <ENTER> key to continue...")
-
-def confirm_action(message: str):
-  print(message)
-  print("1. Ya")
-  print("2. Tidak")
-  choice = int(input("Pilih: "))
-  return choice == 1
 
 class BankApp(BankingSystem):
   _user: User = None
@@ -100,71 +93,16 @@ class BankApp(BankingSystem):
     selected_account = self.select_account(accounts)
     action_func(selected_account)
   
-  def transfer(self, accounts: list[Debit]):
-    def transfer_action(selected_account: Debit):
-      print("=" * 10, "Transfer", "=" * 10, "\n")
-      print("\nSilahkan masukkan nomor rekening tujuan")
-      no_rekening_tujuan = input("No Rekening: ")
-      nominal = int(input("Nominal: "))
-      try:
-        if confirm_action(f"\nApakah anda yakin ingin mentransfer sejumlah {numberToIDR(nominal)} ke rekening {no_rekening_tujuan}?"):
-          selected_account.transfer(nominal, no_rekening_tujuan)
-          print("Transfer berhasil")
-        else:
-          print("Transfer dibatalkan")
-      except AssertionError as e:
-        print(str(e))
-    
+  def transfer(self, accounts: list[Debit]):    
     self.choose_account_action(accounts, transfer_action)
     
-      
   def payment(self, accounts: list[Debit]):
-    def payment_action(selected_account: Debit):
-      print("\nSilahkan masukkan kode pembayaran")
-      kode_pembayaran = input("Kode Pembayaran: ")
-      price = generate_random_price()
-      
-      try:      
-        if confirm_action(f"\nAnda akan membayar sejumlah {numberToIDR(price)} dengan kode pembayaran {kode_pembayaran}"):
-          selected_account.payment(price, kode_pembayaran)
-          print("Pembayaran berhasil")
-        else:
-          print("Pembayaran dibatalkan")
-      except AssertionError as e:
-        print(str(e))
-
     self.choose_account_action(accounts, payment_action)
     
   def deposit(self, accounts: list[Debit]):
-    def deposit_action(selected_account: Debit):
-      print("=" * 10, "Deposit", "=" * 10, "\n")
-      nominal = int(input("Nominal: "))
-      
-      try:
-        if confirm_action(f"\nAnda akan melakukan deposit sejumlah {numberToIDR(nominal)}"):
-          selected_account.deposit(nominal)
-          print("Deposit berhasil")
-        else:
-          print("Deposit dibatalkan")
-      except AssertionError as e:
-        print(str(e))
-
     self.choose_account_action(accounts, deposit_action)
     
   def withdraw(self, accounts: list[Debit]):
-    def withdraw_action(selected_account: Debit):
-      print("=" * 10, "Penarikan", "=" * 10, "\n")
-      nominal = int(input("Nominal: "))
-      
-      try:
-        if confirm_action(f"\nAnda akan melakukan penarikan sejumlah {numberToIDR(nominal)}"):
-          selected_account.withdraw(nominal)
-          print("Penarikan berhasil")
-        else:
-          print("Penarikan dibatalkan")
-      except AssertionError as e:
-        print(str(e))
-
     self.choose_account_action(accounts, withdraw_action)
     
   def transaction_history(self):
