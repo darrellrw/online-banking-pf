@@ -18,7 +18,6 @@ class BankingSystem:
         user.add_account(account)
         return account
 
-
 # Test case
 def main():
     darrell = User(1, "Darrell", "1234567890", "admin@mail.com", "2024-01-01")
