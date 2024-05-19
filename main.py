@@ -215,6 +215,9 @@ class BankApp(BankingSystem):
         print("Rekening baru berhasil dibuat")
       elif pil == 8:
         self.transaction_history()
+      elif pil == 9:
+        print("Terima kasih telah menggunakan Bank App")
+        exit()
       else:
         print("Invalid choice")
       pause()
