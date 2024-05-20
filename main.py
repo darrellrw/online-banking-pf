@@ -6,6 +6,14 @@ from merge_sort import BalanceMergeSort
 import os
 import pwinput
 
+# Menyimpan fungsi aksi yang akan dilakukan ke dalam variabel dictionary
+actions = {
+  "transfer": transfer_action,
+  "payment": payment_action,
+  "deposit": deposit_action,
+  "withdraw": withdraw_action
+}
+
 def pause():
   input("\nPress the <ENTER> key to continue...")
 
@@ -70,7 +78,6 @@ class BankApp(BankingSystem):
     table.add_rows(accounts_sort)
     print(table)
   
-  
   def select_account(self, accounts) -> Debit:
     self.show_balance(accounts)
     
@@ -88,22 +95,32 @@ class BankApp(BankingSystem):
       
     return selected_account
 
+  # Method yang digunakan untuk memilih rekening yang akan digunakan untuk melakukan transaksi
+  # dan menerapakan Higher Order Function untuk memilih aksi yang akan dilakukan
   def choose_account_action(self, accounts, action_func):
     print("\nSilahkan pilih rekening yang akan digunakan untuk melakukan transaksi")
     selected_account = self.select_account(accounts)
     action_func(selected_account)
   
   def transfer(self, accounts: list[Debit]):    
-    self.choose_account_action(accounts, transfer_action)
+    # menerapkan first class function untuk memilih aksi yang akan dilakukan
+    action = actions["transfer"]
+    self.choose_account_action(accounts, action)
     
   def payment(self, accounts: list[Debit]):
-    self.choose_account_action(accounts, payment_action)
+    # menerapkan first class function untuk memilih aksi yang akan dilakukan
+    action = actions["payment"]
+    self.choose_account_action(accounts, action)
     
   def deposit(self, accounts: list[Debit]):
-    self.choose_account_action(accounts, deposit_action)
+    # menerapkan first class function untuk memilih aksi yang akan dilakukan
+    action = actions["deposit"]
+    self.choose_account_action(accounts, action)
     
   def withdraw(self, accounts: list[Debit]):
-    self.choose_account_action(accounts, withdraw_action)
+    # menerapkan first class function untuk memilih aksi yang akan dilakukan
+    action = actions["withdraw"]
+    self.choose_account_action(accounts, action)
     
   def transaction_history(self):
     transactions = self._user.get_transactions()

@@ -6,6 +6,7 @@ class BalanceMergeSort:
     right.append((float('inf'), float('inf')))
     i = j = 0
     for k in range(start, end):
+      # List berurutan berdasarkan balance [(no_rekening, balance), ...]
       if left[i][1] <= right[j][1]:
         list_data[k] = left[i]
         i += 1
@@ -19,6 +20,7 @@ class BalanceMergeSort:
       end = len(list_data)
     if end - start > 1:
       mid = (start + end) // 2
+      # Rekursif
       BalanceMergeSort.sort(list_data, start, mid)
       BalanceMergeSort.sort(list_data, mid, end)
       BalanceMergeSort.merge(list_data, start, mid, end)
